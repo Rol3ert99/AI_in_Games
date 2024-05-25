@@ -2,10 +2,10 @@ from langchain.chains import LLMChain
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 import streamlit as st
-
+from streamlit_modal import Modal
+import time
 
 openai_api_key = ''
-
 
 generate_question_template = """
 Wygeneruj unikalne pytanie quizowe dla {subject} z czterema możliwymi odpowiedziami, gdzie tylko jedna odpowiedź jest poprawna. Podaj poprawną odpowiedź oraz trzy niepoprawne odpowiedzi.
@@ -64,10 +64,23 @@ def main():
             st.session_state.questions = []
             st.session_state.show_feedback = False
             st.session_state.feedback_message = ""
-            for _ in range(10):
-                question_text = generate_question(selected_subject)
-                question, options, correct_answer = parse_question(question_text)
-                st.session_state.questions.append((question, options, correct_answer))
+
+            # Modal for progress
+            modal = Modal("Generowanie pytań...", key="generating_questions", max_width=500)
+            with modal.container():
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+
+                for i in range(10):
+                    question_text = generate_question(selected_subject)
+                    question, options, correct_answer = parse_question(question_text)
+                    st.session_state.questions.append((question, options, correct_answer))
+                    progress_bar.progress((i + 1) / 10.0)
+
+                status_text.text("Pytania wygenerowane!")
+                time.sleep(0.5)
+            
+            modal.close()
 
         if st.session_state.current_question < 10:
             question, options, correct_answer = st.session_state.questions[st.session_state.current_question]
@@ -92,6 +105,9 @@ def main():
         else:
             st.write(f"\nTwój wynik: {st.session_state.correct_answers_count} / 10")
             st.session_state.quiz_started = False
+
+            # Show fireworks GIF
+            st.image("fireworks.gif")
 
 
 if __name__ == "__main__":
