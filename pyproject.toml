@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "projects"
+version = "0.1.0"
+description = ""
+authors = ["Piotr Barabasz <barabasz.piotrek@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain = "^0.2.1"
+langchain-openai = "^0.1.7"
+streamlit = "^1.35.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
